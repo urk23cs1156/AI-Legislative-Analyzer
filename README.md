@@ -131,5 +131,3 @@ Citizen Dashboard Output
 - **AI:** Anthropic Claude Sonnet (via REST API)
 - **Frontend:** Vanilla HTML/CSS/JS (no framework needed)
 - **Deploy:** Render (free tier works)
-
-
