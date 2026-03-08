@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vidhi — India's Legislative AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     HEADER
+════════════════════════════════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">V</div>
+    <div>
+      <div class="logo-text">Vidhi</div>
+      <div class="logo-sub">Legislative AI · Citizen Dashboard</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="token-meter-header">
+      <span>Tokens saved</span>
+      <strong id="headerSaved">—</strong>
+    </div>
+    <div class="eco-badge" id="ecoBadge">🌿 Eco Mode ON</div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════
+     HERO / INPUT
+════════════════════════════════════ -->
+<div class="hero">
+  <h1 class="hero-headline">
+    Every Indian deserves to understand<br>the <span class="accent">laws</span> that govern them.
+  </h1>
+  <p class="hero-sub">
+    Paste any parliamentary bill, gazette notification, or government order.
+    Vidhi compresses and analyses it — giving you clarity in seconds, at a fraction of the energy cost.
+  </p>
+
+  <!-- Upload zone -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept=".txt,.pdf,.docx,.doc" />
+    <div class="upload-icon">📄</div>
+    <div class="upload-title">Drop a bill or policy document</div>
+    <div class="upload-hint">Supports TXT, PDF, DOCX — even 100k+ token documents</div>
+    <button class="upload-btn" type="button">Choose File</button>
+    <div class="format-tags">
+      <span class="format-tag">.pdf</span>
+      <span class="format-tag">.docx</span>
+      <span class="format-tag">.txt</span>
+      <span class="format-tag">100k+ tokens ✓</span>
+    </div>
+  </div>
+
+  <!-- Paste area -->
+  <div class="paste-section">
+    <div class="paste-header">
+      <span>📋 Or paste the document text</span>
+      <span class="char-count" id="charCount">0 chars / ~0 tokens</span>
+    </div>
+    <textarea id="docText" placeholder="Paste the full text of a bill, circular, or gazette notification here..."></textarea>
+  </div>
+
+  <!-- Sample bills -->
+  <div class="sample-section">
+    <div class="sample-label">Try a sample</div>
+    <div class="sample-bills">
+      <button class="sample-bill" onclick="loadSample('dpdp')">🔒 DPDP Act 2023</button>
+      <button class="sample-bill" onclick="loadSample('gst')">💰 GST Amendment</button>
+      <button class="sample-bill" onclick="loadSample('agri')">🌾 Farm Laws</button>
+      <button class="sample-bill" onclick="loadSample('it')">💻 IT Rules 2021</button>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <div class="control-group">
+      <label>Compression Level</label>
+      <div class="range-wrapper">
+        <input type="range" id="compressionLevel" min="1" max="5" value="3"
+               oninput="updateCompression(this.value)" />
+        <span class="range-val" id="compressionVal">3×</span>
+      </div>
+    </div>
+    <div class="control-group">
+      <label>Audience</label>
+      <select id="audience">
+        <option value="citizen">Common Citizen</option>
+        <option value="farmer">Farmer / Rural</option>
+        <option value="business">Business Owner</option>
+        <option value="student">Student</option>
+        <option value="legal">Legal Professional</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Summary Language</label>
+      <select id="summaryLang">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="simple">Simple English</option>
+      </select>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+      ⚡ Analyse Bill
+    </button>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <strong style="font-family:'Playfair Display',serif;font-size:1.1rem">Reading the bill…</strong>
+    <ul class="loading-steps" id="loadingSteps">
+      <li id="step1"><span class="step-dot"></span> Tokenising document</li>
+      <li id="step2"><span class="step-dot"></span> Applying token compression</li>
+      <li id="step3"><span class="step-dot"></span> Extracting key provisions</li>
+      <li id="step4"><span class="step-dot"></span> Generating citizen summary</li>
+      <li id="step5"><span class="step-dot"></span> Scoring readability &amp; impact</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     RESULTS
+════════════════════════════════════ -->
+<div id="results">
+
+  <!-- Token savings banner -->
+  <div class="token-banner reveal" id="tokenBanner">
+    <div class="token-stat">
+      <label>Original Tokens</label>
+      <div class="val orange" id="origTokens">—</div>
+      <div class="unit">tokens</div>
+    </div>
+    <div class="token-stat">
+      <label>After Compression</label>
+      <div class="val saffron" id="compTokens">—</div>
+      <div class="unit">tokens</div>
+    </div>
+    <div class="token-stat">
+      <label>Compression Ratio</label>
+      <div class="val green" id="compRatio">—</div>
+      <div class="unit">reduction</div>
+    </div>
+    <div class="token-stat">
+      <label>CO₂ Saved</label>
+      <div class="val blue" id="co2SavedBanner">—</div>
+      <div class="unit">gCO₂eq</div>
+    </div>
+  </div>
+
+  <div class="results-grid">
+
+    <!-- Plain Language Summary -->
+    <div class="card reveal">
+      <div class="card-header">
+        <h3>📜 Plain Language Summary</h3>
+        <span class="card-badge badge-saffron" id="billTitle">Bill Analysis</span>
+      </div>
+      <div class="card-body">
+        <div class="summary-text" id="summaryText">Loading…</div>
+        <div class="eli5-box">
+          <p id="eli5Text">Loading…</p>
+        </div>
+        <div class="actions-footer">
+          <button class="action-btn btn-primary"  onclick="copyResults()">📋 Copy Summary</button>
+          <button class="action-btn btn-outline"   onclick="shareResults()">🔗 Share</button>
+          <button class="action-btn btn-outline"   onclick="downloadPDF()">⬇️ Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+
+      <!-- Token Compression card -->
+      <div class="card reveal">
+        <div class="card-header">
+          <h3>🗜️ Token Compression</h3>
+          <span class="card-badge badge-green">Energy Saved</span>
+        </div>
+        <div class="card-body">
+          <div class="compression-viz">
+            <div class="comp-block">
+              <div class="comp-num" style="color:var(--red)"   id="origBlock">—</div>
+              <div class="comp-label">Raw Tokens</div>
+            </div>
+            <div class="comp-arrow">→</div>
+            <div class="comp-block">
+              <div class="comp-num" style="color:var(--green)" id="compBlock">—</div>
+              <div class="comp-label">Compressed</div>
+            </div>
+          </div>
+          <div class="concern-meter">
+            <div class="meter-label"><span>Compression efficiency</span><span id="effPct">—%</span></div>
+            <div class="meter-bar"><div class="meter-fill" id="effBar" style="background:var(--green);width:0%"></div></div>
+          </div>
+          <div style="margin-top:0.5rem">
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:1px">Compressed prompt sent to AI</div>
+            <div class="compressed-prompt" id="compressedPromptView">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Environmental Impact card -->
+      <div class="card reveal">
+        <div class="card-header">
+          <h3>🌿 Environmental Impact</h3>
+          <span class="card-badge badge-green">Green AI</span>
+        </div>
+        <div class="card-body">
+          <div class="co2-display">
+            <div class="co2-num"  id="co2Saved">—</div>
+            <div class="co2-unit">gCO₂eq saved this query</div>
+          </div>
+          <div class="co2-context" id="co2Context">—</div>
+          <div class="concern-meter" style="margin-top:1rem">
+            <div class="meter-label"><span>Energy efficiency vs baseline</span><span id="energyPct">—%</span></div>
+            <div class="meter-bar"><div class="meter-fill" id="energyBar" style="background:linear-gradient(90deg,var(--green),var(--saffron));width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right column -->
+
+    <!-- Key Provisions (full width) -->
+    <div class="card full-width reveal">
+      <div class="card-header">
+        <h3>⚖️ Key Provisions</h3>
+        <span class="card-badge badge-blue" id="provisionCount">— items</span>
+      </div>
+      <div class="card-body">
+        <ul class="key-points" id="keyPoints">
+          <li><span class="point-num">1</span><span>Loading…</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Who is Affected -->
+    <div class="card reveal">
+      <div class="card-header">
+        <h3>👥 Who is Affected?</h3>
+        <span class="card-badge badge-saffron">Stakeholders</span>
+      </div>
+      <div class="card-body">
+        <div class="group-chips" id="groupChips">—</div>
+        <div id="groupDetail" style="margin-top:1rem;font-size:0.85rem;color:var(--muted);line-height:1.7">
+          Click a group above to see specific impact.
+        </div>
+      </div>
+    </div>
+
+    <!-- Concerns -->
+    <div class="card reveal">
+      <div class="card-header">
+        <h3>⚠️ Concerns Raised</h3>
+        <span class="card-badge badge-red">Civil Society</span>
+      </div>
+      <div class="card-body" id="concernsBody">
+        <div style="font-size:0.85rem;color:var(--muted)">Loading…</div>
+      </div>
+    </div>
+
+  </div><!-- /results-grid -->
+</div><!-- /results -->
+
+<!-- ════════════════════════════════════
+     SCRIPTS  (order matters)
+════════════════════════════════════ -->
+<script src="js/compression.js"></script>
+<script src="js/samples.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
