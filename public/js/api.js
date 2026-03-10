@@ -133,3 +133,5 @@ function getFallbackResult() {
     readabilityLabel: 'N/A',
   };
 }
+
+
