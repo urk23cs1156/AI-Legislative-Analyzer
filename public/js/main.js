@@ -104,3 +104,4 @@ async function analyze() {
 
   document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+// minor fix
