@@ -17,6 +17,7 @@ let sessionTokensSaved = 0;
  *   4. Call Claude (single or map-reduce)
  *   5. Render results
  */
+
 async function analyze() {
   const text = document.getElementById('docText').value.trim();
   if (!text || text.length < 50) {
