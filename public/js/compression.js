@@ -1,16 +1,3 @@
-/* ─────────────────────────────────────────
-   VIDHI — Legislative AI Dashboard
-   js/compression.js  —  Token Compression Engine
-
-   Strategy (matches hackathon "Token Compression" requirement):
-   1. Legal boilerplate abbreviation
-   2. Redundant phrase stripping
-   3. Cross-reference normalization
-   4. Structural preamble removal (levels 3+)
-   5. Sub-clause deduplication (levels 4+)
-   6. Chunking for 100k+ token documents (map-reduce)
-───────────────────────────────────────── */
-
 // ── Abbreviation dictionary for Indian legal text ──
 const LEGAL_ABBREVS = {
   'Government of India':                          'GoI',
